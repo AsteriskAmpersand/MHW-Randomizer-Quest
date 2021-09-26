@@ -30,24 +30,10 @@ static std::string PLUGIN_NAME = "Randomizer";
 
 
 
-bool unprotect(byte* ptr, int len, PDWORD oldp) {
+bool unprotect(auto ptr, int len, PDWORD oldp) {
     return VirtualProtect((LPVOID)(ptr), len, PAGE_EXECUTE_READWRITE, oldp);
 }
-bool unprotect(int* ptr, int len, PDWORD oldp) {
-    return VirtualProtect((LPVOID)(ptr), len, PAGE_EXECUTE_READWRITE, oldp);
-}
-bool unprotect(short* ptr, int len, PDWORD oldp) {
-    return VirtualProtect((LPVOID)(ptr), len, PAGE_EXECUTE_READWRITE, oldp);
-}
-bool protect(byte* ptr, int len, PDWORD oldp) {
-    DWORD dummy;
-    return VirtualProtect((LPVOID)(ptr), len, *oldp, &dummy);
-}
-bool protect(int* ptr, int len, PDWORD oldp) {
-    DWORD dummy;
-    return VirtualProtect((LPVOID)(ptr), len, *oldp, &dummy);
-}
-bool protect(short* ptr, int len, PDWORD oldp) {
+bool protect(auto ptr, int len, PDWORD oldp) {
     DWORD dummy;
     return VirtualProtect((LPVOID)(ptr), len, *oldp, &dummy);
 }
@@ -376,7 +362,10 @@ static Quests Initialize(Options &opts) {
     // now initialize monster Data within qData
     // this means players can also edit what mons the rando uses while the game is running
     // by just reinitializing
-    std::string path("nativePC/plugins/RandomizerMonsters");
+    std::string root;
+    if (std::filesystem::exists("ICE")){ root = "ICE/ntPC";}
+    else {root = "nativePC";}
+    std::string path(root+"/plugins/RandomizerMonsters");
     std::string ext(".json");
     for (auto& p : std::filesystem::recursive_directory_iterator(path)) {
         if (p.path().extension() == ext) {
